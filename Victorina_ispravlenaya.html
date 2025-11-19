@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная викторина по JavaScript</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .mode-switch {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .mode-switch label {
+            background: #e9f2ff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .question h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 12px;
+        }
+        
+        .hint-box {
+            display: none;
+            background: #e9f2ff;
+            border-left: 4px solid #4a90e2;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #checkBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 100;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(74, 144, 226, 0.3);
+        }
+        
+        #checkBtn:hover {
+            background: #3a7cc0;
+            transform: translateY(-2px);
+        }
+        
+        .completed #checkBtn {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translateY(-2px) scale(1); }
+            50% { transform: translateY(-2px) scale(1.05); }
+            100% { transform: translateY(-2px) scale(1); }
+        }
+        
+        .timer {
+            display: inline-block;
+            background: #ffeb3b;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #e9f2ff;
+            display: none;
+            text-align: center;
+        }
+        
+        .congrats {
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .result-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .suggestions {
+            background: #e0f7fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        
+        .suggestions h4 {
+            color: #0288d1;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .note {
+            background: #fff9c4;
+            border-left: 4px solid #fbc02d;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Интерактивная викторина по JavaScript</h1>
+            <p>Проверьте свои знания по работе с формами, условиями и обработкой данных</p>
+        </header>
+        
+        <div class="mode-switch">
+            <label>
+                <input type="checkbox" id="trainingMode"> Тренировочный режим (без таймера)
+            </label>
+        </div>
+        
+        <div class="question">
+            <h3>1. Какой оператор используется для строгого сравнения в JavaScript?</h3>
+            <div class="options">
+                <div class="option">
+                    <input type="radio" name="q1" value="a" id="q1a">
+                    <label for="q1a">==</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q1" value="b" id="q1b">
+                    <label for="q1b">===</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q1" value="c" id="q1c">
+                    <label for="q1c">=</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q1" value="d" id="q1d">
+                    <label for="q1d">!=</label>
+                </div>
+            </div>
+            <div class="hint-box" id="hint1"></div>
+        </div>
+        
+        <div class="question">
+            <h3>2. Какая функция используется для удаления пробелов в начале и конце строки?</h3>
+            <div class="options">
+                <div class="option">
+                    <input type="radio" name="q2" value="a" id="q2a">
+                    <label for="q2a">substring()</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q2" value="b" id="q2b">
+                    <label for="q2b">replace()</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q2" value="c" id="q2c">
+                    <label for="q2c">trim()</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q2" value="d" id="q2d">
+                    <label for="q2d">slice()</label>
+                </div>
+            </div>
+            <div class="hint-box" id="hint2"></div>
+        </div>
+        
+        <div class="question">
+            <h3>3. Что будет результатом выражения: "5" === 5?</h3>
+            <div class="options">
+                <div class="option">
+                    <input type="radio" name="q3" value="a" id="q3a">
+                    <label for="q3a">true</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q3" value="b" id="q3b">
+                    <label for="q3b">false</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q3" value="c" id="q3c">
+                    <label for="q3c">Error</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q3" value="d" id="q3d">
+                    <label for="q3d">undefined</label>
+                </div>
+            </div>
+            <div class="hint-box" id="hint3"></div>
+        </div>
+        
+        <div class="question">
+            <h3>4. Как создать переменную в JavaScript?</h3>
+            <div class="options">
+                <div class="option">
+                    <input type="radio" name="q4" value="a" id="q4a">
+                    <label for="q4a">var x = 5;</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q4" value="b" id="q4b">
+                    <label for="q4b">variable x = 5;</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q4" value="c" id="q4c">
+                    <label for="q4c">int x = 5;</label>
+                </div>
+                <div class="option">
+                    <input type="radio" name="q4" value="d" id="q4d">
+                    <label for="q4d">x = 5;</label>
+                </div>
+            </div>
+            <div class="hint-box" id="hint4"></div>
+        </div>
+        
+        <div id="result">
+            <div class="congrats">Поздравляем!</div>
+            <div class="result-text" id="resultText"></div>
+            <div class="suggestions">
+                <h4>Рекомендации:</h4>
+                <ul id="suggestionsList" style="text-align: left; margin-left: 20px;"></ul>
+            </div>
+        </div>
+        
+        <div class="note">
+            <strong>Совет:</strong> В тренировочном режиме вы можете изучать материал без временных ограничений. 
+            При неправильном ответе появятся подсказки с примерами из практических работ.
+        </div>
+        
+        <footer>
+            <p>Викторина для учебного процесса | Практическая работа №3</p>
+        </footer>
+    </div>
+    
+    <button id="checkBtn" onclick="checkQuiz()">Проверить результаты</button>
+    
+    <script>
+        let timer;
+        let timeLeft = 180;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const trainingMode = document.getElementById('trainingMode');
+            
+
+            if (!trainingMode.checked) {
+                startTimer();
+            }
+            
+
+            trainingMode.addEventListener('change', function() {
+                const timerElement = document.querySelector('.timer');
+                if (this.checked) {
+
+                    if (timer) {
+                        clearInterval(timer);
+                        timer = null;
+                    }
+                    if (timerElement) {
+                        timerElement.remove();
+                    }
+                } else {
+
+                    startTimer();
+                }
+            });
+
+            document.querySelectorAll('.option input[type="radio"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const questionId = this.name;
+                    const hintId = 'hint' + questionId.replace('q', '');
+                    const hintBox = document.getElementById(hintId);
+
+                    document.querySelectorAll('.hint-box').forEach(hint => {
+                        hint.style.display = 'none';
+                    });
+
+                    if (this.value !== getCorrectAnswer(questionId)) {
+                        const hint = getHint(questionId, this.value);
+                        hintBox.innerHTML = hint;
+                        hintBox.style.display = 'block';
+                    }
+                });
+            });
+        });
+        
+        function startTimer() {
+            timeLeft = 180;
+            const timerContainer = document.createElement('span');
+            timerContainer.className = 'timer';
+            timerContainer.id = 'timerDisplay';
+            
+            document.querySelector('.mode-switch').appendChild(timerContainer);
+            
+            timer = setInterval(function() {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('timerDisplay').textContent = 
+                    `Время: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert('Время вышло! Результаты будут автоматически отправлены.');
+                    checkQuiz();
+                }
+            }, 1000);
+        }
+        
+        function getCorrectAnswer(questionId) {
+            const answers = {
+                'q1': 'b',
+                'q2': 'c',
+                'q3': 'b',
+                'q4': 'a'
+            };
+            return answers[questionId];
+        }
+        
+        function getHint(questionId, selectedAnswer) {
+            const hints = {
+                'q1': {
+                    'a': 'Подсказка: Оператор == выполняет нестрогое сравнение с преобразованием типов. Например: "5" == 5 → true',
+                    'b': '',
+                    'c': 'Подсказка: Оператор = используется для присваивания значений, а не для сравнения',
+                    'd': 'Подсказка: Оператор != проверяет неравенство, но также преобразует типы данных'
+                },
+                'q2': {
+                    'a': 'Подсказка: substring() извлекает часть строки между указанными индексами',
+                    'b': 'Подсказка: replace() заменяет часть строки на другую строку',
+                    'c': '',
+                    'd': 'Подсказка: slice() извлекает часть строки и возвращает новую строку'
+                },
+                'q3': {
+                    'a': 'Подсказка: Строгое сравнение (===) проверяет тип данных. "5" - строка, 5 - число',
+                    'b': '',
+                    'c': 'Подсказка: Это выражение синтаксически верно и не вызывает ошибку',
+                    'd': 'Подсказка: undefined возвращается, когда переменная не определена'
+                },
+                'q4': {
+                    'a': '',
+                    'b': 'Подсказка: В JavaScript нет ключевого слова variable для объявления переменных',
+                    'c': 'Подсказка: int - это тип данных из других языков, например, Java',
+                    'd': 'Подсказка: В строгом режиме такой синтаксис вызовет ошибку, так как переменная не объявлена'
+                }
+            };
+            
+            return hints[questionId][selectedAnswer];
+        }
+        
+        function checkQuiz() {
+            let score = 0;
+            const totalQuestions = 4;
+            const suggestions = [];
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`)?.value;
+                const correct = getCorrectAnswer(`q${i}`);
+                
+                if (selected === correct) {
+                    score++;
+                } else {
+                    const questionText = document.querySelector(`.question:nth-of-type(${i}) h3`).textContent;
+                    suggestions.push(`- Повторите тему: ${questionText}`);
+                }
+            }
+            
+
+            const resultDiv = document.getElementById('result');
+            const resultText = document.getElementById('resultText');
+            const suggestionsList = document.getElementById('suggestionsList');
+            
+
+            suggestionsList.innerHTML = '';
+            
+
+            if (score === totalQuestions) {
+                resultText.textContent = `Вы набрали ${score} из ${totalQuestions} баллов. Отличный результат!`;
+            } else if (score >= totalQuestions / 2) {
+                resultText.textContent = `Вы набрали ${score} из ${totalQuestions} баллов. Хороший результат, но есть над чем работать.`;
+            } else {
+                resultText.textContent = `Вы набрали ${score} из ${totalQuestions} баллов. Рекомендуется повторить материал.`;
+            }
+            
+            if (suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    li.textContent = suggestion;
+                    suggestionsList.appendChild(li);
+                });
+            } else {
+                suggestionsList.innerHTML = '<li>Вы отлично справились со всеми вопросами!</li>';
+            }
+            
+            resultDiv.style.display = 'block';
+            document.body.classList.add('completed');
+            
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+    </script>
+</body>
+</html>
